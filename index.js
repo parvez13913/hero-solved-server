@@ -19,6 +19,7 @@ async function run() {
     try {
         await client.connect();
         const todoCollection = client.db('HeroSolved').collection('todo');
+        const completedTodoCollection = client.db('HeroSolved').collection('completedTodo');
 
         app.post('/todo', async (req, res) => {
             const todo = req.body;
@@ -40,6 +41,22 @@ async function run() {
             res.send(todo);
         });
 
+        // completed ToDo
+        app.post('/completedTodo', async (req, res) => {
+            const todo = req.body;
+            const result = await completedTodoCollection.insertOne(todo);
+            res.send(result);
+        });
+
+        app.get('/completedTodo', async (req, res) => {
+            const quary = {};
+            const cursor = completedTodoCollection.find(quary);
+            const completedTodo = await cursor.toArray();
+            res.send(completedTodo);
+        });
+
+
+
         app.get('/todo/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -48,17 +65,17 @@ async function run() {
         })
 
 
-        // app.put('/todo/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const todo = req.body;
-        //     const filter = { _id: ObjectId(id) };
-        //     const options = { upsert: true };
-        //     const updatedDoc = {
-        //         $set: todo,
-        //     };
-        //     const result = await todoCollection.updateOne(filter, updatedDoc, options);
-        //     res.send(result);
-        // });
+        app.put('/todo/:id', async (req, res) => {
+            const id = req.params.id;
+            const todo = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: todo,
+            };
+            const result = await todoCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
     }
     finally {
 
