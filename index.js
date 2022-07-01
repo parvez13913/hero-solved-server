@@ -62,7 +62,26 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const todo = await todoCollection.findOne(query);
             res.send(todo);
-        })
+        });
+
+        app.get('/calender/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const todo = await todoCollection.findOne(query);
+            res.send(todo);
+        });
+
+        app.put('/calender/:id', async (req, res) => {
+            const id = req.params.id;
+            const todo = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: todo,
+            };
+            const result = await todoCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
 
 
         app.put('/todo/:id', async (req, res) => {
